@@ -170,6 +170,10 @@ details.cenik[open] summary::before{transform:rotate(90deg)}
         <div class="row"><label class="toggle"><input type="checkbox" id="s_etik"><span class="sw"></span>Výroba etiket</label></div>
         <div class="row"><label class="toggle"><input type="checkbox" id="s_trans"><span class="sw"></span>Výroba transportních obalů</label></div>
         <div class="note">Tiskové a výrobní projekty naceňujeme individuálně podle zadání — zaškrtněte, o co máte zájem, a připravíme nabídku.</div>
+        <div class="subh">Plochy navíc</div>
+        <div class="row"><label class="toggle"><input type="checkbox" id="s_sklad"><span class="sw"></span>Plocha na skladování navíc</label><div class="ig" style="max-width:130px"><input type="number" id="a_sklad" min="0" placeholder="0"><span class="u">m&sup2;</span></div></div>
+        <div class="row"><label class="toggle"><input type="checkbox" id="s_vyroba"><span class="sw"></span>Plocha pro výrobu / kompletaci</label><div class="ig" style="max-width:130px"><input type="number" id="a_vyroba" min="0" placeholder="0"><span class="u">m&sup2;</span></div></div>
+        <div class="note">Plochy zajistíme podle potřeby — zaškrtněte a uveďte přibližnou výměru, upřesníme v nabídce.</div>
       </div>
 
       <div class="card">
@@ -345,11 +349,17 @@ function calc(){
   if(document.getElementById('s_etik').checked)interest.push('etikety');
   if(document.getElementById('s_trans').checked)interest.push('transportní obaly');
 
+  // interest-only area flags
+  var plochy=[];
+  if(document.getElementById('s_sklad').checked)plochy.push('skladování '+(val('a_sklad')||0)+' m²');
+  if(document.getElementById('s_vyroba').checked)plochy.push('výroba/kompletace '+(val('a_vyroba')||0)+' m²');
+
   var html='';
   items.forEach(function(it){
     if(it[1]===null)html+='<div class="bk sec">'+it[0]+'</div>';
     else html+='<div class="bk"><span>'+it[0]+'</span><span class="v">'+czk(it[1])+'</span></div>';});
   if(interest.length)html+='<div class="bk tiny" style="padding-top:12px"><span>+ Tisk: '+interest.join(', ')+'</span><span class="v">dle poptávky</span></div>';
+  if(plochy.length)html+='<div class="bk tiny"><span>+ Plochy navíc: '+plochy.join(', ')+'</span><span class="v">dle poptávky</span></div>';
   document.getElementById('breakdown').innerHTML=html;
   document.getElementById('total').textContent=czk(total);
   document.getElementById('perobj').textContent=(total/orders).toFixed(1).replace('.',',')+' Kč / objednávka';
@@ -384,6 +394,7 @@ function openModal(){
     +'Doprava: '+mix+'\n'
     +'AI Shippy: '+(document.getElementById('shippyon').checked?'ano':'ne')+'\n'
     +'Zájem o tisk: '+[['s_obaly','obaly'],['s_etik','etikety'],['s_trans','transportní']].filter(function(x){return document.getElementById(x[0]).checked;}).map(function(x){return x[1];}).join(', ')+'\n'
+    +'Plochy navíc: '+[['s_sklad','a_sklad','skladování'],['s_vyroba','a_vyroba','výroba/kompletace']].filter(function(x){return document.getElementById(x[0]).checked;}).map(function(x){return x[2]+' '+(val(x[1])||0)+' m²';}).join(', ')+'\n'
     +'CELKEM: '+document.getElementById('total').textContent+' ('+document.getElementById('perobj').textContent+')';
   document.getElementById('calcField').value=sum;
   document.getElementById('modal').classList.add('show');
